@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Listing Page</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Sora', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary': '#2dd4bf', 
+                        'secondary': '#a78bfa',
+                        'accent': '#f472b6',
+                        'dark-bg': '#0D1117',
+                        'light-bg': '#f5f5f5',
+                    },
+                },
+            },
+        };
+    </script>
+    
+    <style>
+        .glass-card {
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+            border: 1px solid;
+            transition: transform 0.2s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .light .glass-card {
+            background: rgba(255, 255, 255, 0.5);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+        .dark .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .glass-card:hover {
+            border-color: rgba(45, 212, 191, 0.5);
+            box-shadow: 0 0 25px rgba(45, 212, 191, 0.2);
+        }
+        .dark .glass-card:hover {
+            border-color: rgba(45, 212, 191, 0.6);
+            box-shadow: 0 0 30px rgba(45, 212, 191, 0.25);
+        }
+        .glow-button::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 9999px;
+            background: radial-gradient(circle, rgba(45, 212, 191, 0.4) 0%, transparent 70%);
+            filter: blur(20px);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .glow-button:hover::after { 
+            opacity: 1; 
+        }
+        .tag-primary { @apply bg-primary/20 text-primary text-sm px-3 py-1 rounded-full; }
+        .tag-secondary { @apply bg-secondary/20 text-secondary text-sm px-3 py-1 rounded-full; }
+        .tag-accent { @apply bg-accent/20 text-accent text-sm px-3 py-1 rounded-full; }
+
+        /* Hover effect */
+        .product-card {
+            position: relative;
+            transform: scale(1);
+            transition: transform 0.3s ease-in-out;
+            transform-origin: center;
+            z-index: 1;
+        }
+
+        .product-card:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+        .product-card-details {
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .product-card:hover .product-card-details {
+            opacity: 0;
+        }
+
+        .product-card-hover-details {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            opacity: 0;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            z-index: 11;
+            pointer-events: none;
+            width: 120%;
+            height: 120%;
+        }
+        .product-card:hover .product-card-hover-details {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-light-bg dark:bg-dark-bg text-gray-800 dark:text-gray-300 font-sans selection:bg-primary/40 transition-colors duration-300">
+
+    <header class="fixed top-0 left-0 w-full z-50 transition-all duration-300" id="header">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center glass-card mt-4 rounded-full">
+            <a href="products.html" class="text-xl font-bold tracking-wider text-gray-900 dark:text-white ml-2">SS Store</a>
+            
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="index.html" class="hover:text-primary transition-colors font-bold">Main Menu</a>
+                <a href="#products" class="hover:text-primary transition-colors">Products</a>
+                <a href="#about" class="hover:text-primary transition-colors">About</a>
+                <a href="#contact" class="hover:text-primary transition-colors">Contact</a>
+            </div>
+
+            <div class="flex items-center">
+                <button id="theme-toggle" class="text-lg w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
+                    <i class="fas fa-sun hidden dark:inline"></i>
+                    <i class="fas fa-moon inline dark:hidden"></i>
+                </button>
+                <button id="mobile-menu-button" class="md:hidden text-lg w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/10 transition-colors ml-2">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden max-w-7xl mx-auto mt-2 px-2">
+            <div class="glass-card rounded-2xl p-4 flex flex-col space-y-2">
+                <a href="index.html" class="hover:text-primary transition-colors text-center p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 font-bold">Home</a>
+                <a href="#products" class="hover:text-primary transition-colors text-center p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5">Products</a>
+                <a href="#about" class="hover:text-primary transition-colors text-center p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5">About</a>
+                <a href="#contact" class="hover:text-primary transition-colors text-center p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5">Contact</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-24 min-h-screen">
+        <section id="products" class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-gray-900 dark:text-white">Shop Our Collection</h1>
+                <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">Find the perfect item from our wide selection.</p>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-4 mb-8">
+                <div class="relative flex-grow">
+                    <input type="text" id="search-input" placeholder="Search for products..." class="w-full glass-card rounded-full py-2 px-5 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    <button class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition" id="search-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <div id="search-suggestions" class="absolute top-full mt-2 w-full glass-card rounded-2xl p-2 z-20 hidden">
+                        </div>
+                </div>
+
+                <div class="relative inline-block text-left">
+                    <button type="button" class="glass-card w-full justify-center rounded-full px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-white/10 dark:hover:bg-white/5 focus:outline-none" id="sort-menu-button">
+                        Sort By
+                        <i class="fas fa-chevron-down ml-2 -mr-1 text-xs"></i>
+                    </button>
+                    <div id="sort-menu" class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white dark:bg-dark-bg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+                        <div class="py-1">
+                            <button class="text-gray-700 dark:text-gray-300 block w-full text-left px-4 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/5" data-sort="price-low-to-high">Price: Low to High</button>
+                            <button class="text-gray-700 dark:text-gray-300 block w-full text-left px-4 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/5" data-sort="price-high-to-low">Price: High to Low</button>
+                            <button class="text-gray-700 dark:text-gray-300 block w-full text-left px-4 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/5" data-sort="rating-high-to-low">Rating: High to Low</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative inline-block text-left">
+                    <button type="button" class="glass-card w-full justify-center rounded-full px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-white/10 dark:hover:bg-white/5 focus:outline-none" id="filter-menu-button">
+                        Filter By Category
+                        <i class="fas fa-chevron-down ml-2 -mr-1 text-xs"></i>
+                    </button>
+                    <div id="filter-menu" class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white dark:bg-dark-bg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden">
+                        <div class="py-1" id="category-filter-list">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            </div>
+        </section>
+
+        <section id="about" class="py-24 bg-white/30 dark:bg-dark-bg/50">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+                <h2 class="text-4xl font-bold text-gray-900 dark:text-white">Our Vision ✨</h2>
+                <p class="mt-4 text-lg text-gray-600 dark:text-gray-400">
+                    This interactive shopping experience was brought to life by <strong>Sarvesh Soumil</strong>. His vision was to go beyond a simple product list and create a seamless, intuitive, and enjoyable journey for every visitor.
+                </p>
+                <p class="mt-2 text-md text-gray-600 dark:text-gray-400">
+                    From the instant search suggestions to the smooth filtering and sorting, every element was designed with you in mind. This page is a showcase of how modern technology and thoughtful design can make online shopping a true pleasure.
+                </p>
+            </div>
+        </section>
+
+        <section id="contact" class="py-24">
+            <div class="max-w-3xl mx-auto text-center px-4 sm:px-6">
+                <h2 class="text-4xl font-bold text-gray-900 dark:text-white">Let's Connect 📬</h2>
+                <p class="mt-4 text-lg text-gray-600 dark:text-gray-400 mb-8">
+                    Whether you have a question about this project, an exciting opportunity, or just want to say hello, my inbox is always open. Feel free to reach out!
+                </p>
+                <div class="inline-flex items-center space-x-4 group">
+                    <a href="mailto:sarveshsoumil@email.com" class="text-xl font-semibold text-primary group-hover:underline">
+                        sarveshsoumil@email.com
+                    </a>
+                    <button id="copy-email" class="text-gray-400 hover:text-primary transition" title="Copy email">
+                        <i id="copy-icon" class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 text-center text-gray-600 dark:text-gray-500">
+            <div class="flex justify-center space-x-6 mb-4">
+                 <a href="#" target="_blank" class="text-2xl hover:text-primary transition"><i class="fab fa-github"></i></a>
+                 <a href="#" target="_blank" class="text-2xl hover:text-primary transition"><i class="fab fa-linkedin"></i></a>
+                 <a href="#" target="_blank" class="text-2xl hover:text-primary transition"><i class="fab fa-instagram"></i></a>
+            </div>
+            <p>Copyright &copy; <span id="current-year"></span> SS Store. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- THEME SWITCH LOGIC ---
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const storedTheme = localStorage.getItem('color-theme');
+            if (storedTheme === 'dark' || (!storedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            themeToggleBtn.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                localStorage.setItem('color-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+            });
+
+            // --- MOBILE MENU TOGGLE ---
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // --- HIDE MOBILE MENU ON LINK CLICK ---
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            // --- DATE & YEAR ---
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+
+            // --- COPY EMAIL LOGIC ---
+            const copyBtn = document.getElementById('copy-email');
+            const copyIcon = document.getElementById('copy-icon');
+            const emailToCopy = 'sarveshsoumil@email.com';
+            copyBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(emailToCopy).then(() => {
+                    copyIcon.classList.replace('fa-copy', 'fa-check');
+                    copyBtn.title = 'Copied!';
+                    setTimeout(() => {
+                        copyIcon.classList.replace('fa-check', 'fa-copy');
+                        copyBtn.title = 'Copy email';
+                    }, 2000);
+                });
+            });
+
+            // --- PRODUCT DATA (with local image paths) ---
+            const products = [
+                { id: 1, name: 'Wireless Bluetooth Headphones', price: 99.99 * 82.5, category: 'Electronics', rating: 4.5, image: 'images/headphones.jpg', description: 'Experience crystal-clear audio with these comfortable, long-lasting headphones.', purchases: 1200, warranty: '2-Year' },
+                { id: 2, name: 'Men\'s Classic Fit T-Shirt', price: 25.00 * 82.5, category: 'Clothing', rating: 4.2, image: 'images/t-shirt.jpg', description: 'A soft, breathable t-shirt perfect for everyday wear.', purchases: 850, warranty: '30-Day return' },
+                { id: 3, name: 'Modern Desk Lamp', price: 55.50 * 82.5, category: 'Home Decor', rating: 4.8, image: 'images/lamp.jpg', description: 'Sleek and minimalist design with adjustable brightness for your workspace.', purchases: 600, warranty: '1-Year' },
+                { id: 4, name: 'Ergonomic Office Chair', price: 250.00 * 82.5, category: 'Furniture', rating: 4.7, image: 'images/chair.jpg', description: 'Built with breathable mesh and lumbar support for all-day comfort. Material: Mesh & Steel.', purchases: 450, warranty: '5-Year' },
+                { id: 5, name: 'High-Performance Gaming Mouse', price: 75.00 * 82.5, category: 'Electronics', rating: 4.9, image: 'images/mouse.jpg', description: 'Precision sensor and customizable RGB lighting for the ultimate gaming experience.', purchases: 2100, warranty: '1-Year' },
+                { id: 6, name: 'Women\'s Yoga Pants', price: 45.00 * 82.5, category: 'Clothing', rating: 4.6, image: 'images/yoga-pants.jpg', description: 'Stretchy and soft fabric, ideal for yoga and fitness. Material: Spandex-blend.', purchases: 950, warranty: '60-Day return' },
+                { id: 7, name: 'Ceramic Coffee Mug Set', price: 30.00 * 82.5, category: 'Home Decor', rating: 4.3, image: 'images/mug-set.jpg', description: 'Set of four durable ceramic mugs, perfect for your morning brew. Material: Ceramic.', purchases: 720, warranty: 'None' },
+                { id: 8, name: 'Wooden Bookshelf', price: 150.00 * 82.5, category: 'Furniture', rating: 4.5, image: 'images/bookshelf.jpg', description: 'A sturdy and elegant bookshelf to organize your collection. Material: Engineered Wood.', purchases: 380, warranty: '3-Year' },
+                { id: 9, name: 'Smart Watch', price: 199.99 * 82.5, category: 'Electronics', rating: 4.8, image: 'images/smart-watch.jpg', description: 'Track your fitness, heart rate, and notifications on your wrist.', purchases: 1550, warranty: '2-Year' },
+                { id: 10, name: 'Leather Wallet', price: 40.00 * 82.5, category: 'Accessories', rating: 4.4, image: 'images/wallet.jpg', description: 'A classic and slim leather wallet with multiple card slots. Material: Genuine Leather.', purchases: 640, warranty: '1-Year' },
+                { id: 11, name: 'Decorative Wall Clock', price: 60.00 * 82.5, category: 'Home Decor', rating: 4.7, image: 'images/wall-clock.jpg', description: 'Silent, non-ticking mechanism with a modern metal frame. Material: Metal.', purchases: 290, warranty: '1-Year' },
+                { id: 12, name: 'Stainless Steel Water Bottle', price: 20.00 * 82.5, category: 'Accessories', rating: 4.9, image: 'images/water-bottle.jpg', description: 'Keep your drinks cold for 24 hours and hot for 12. Material: Stainless Steel.', purchases: 1800, warranty: 'Lifetime' },
+                { id: 13, name: 'Noise-Cancelling Earbuds', price: 120.00 * 82.5, category: 'Electronics', rating: 4.6, image: 'images/earbuds.jpg', description: 'Block out the world with active noise cancellation and clear calls.', purchases: 980, warranty: '2-Year' },
+                { id: 14, name: 'Casual Denim Jacket', price: 85.00 * 82.5, category: 'Clothing', rating: 4.1, image: 'images/denim-jacket.jpg', description: 'A timeless wardrobe essential with a comfortable fit. Material: Denim.', purchases: 510, warranty: '30-Day return' },
+                { id: 15, name: 'Aromatherapy Diffuser', price: 35.00 * 82.5, category: 'Home Decor', rating: 4.5, image: 'images/diffuser.jpg', description: 'Fills your room with soothing scents and a gentle, ambient light.', purchases: 760, warranty: '1-Year' },
+                { id: 16, name: 'King Size Bed Frame', price: 450.00 * 82.5, category: 'Furniture', rating: 4.8, image: 'images/bed-frame.jpg', description: 'A sturdy platform bed frame with a sleek, minimalist design. Material: Steel.', purchases: 220, warranty: '10-Year' },
+                { id: 17, name: 'Portable Power Bank', price: 30.00 * 82.5, category: 'Electronics', rating: 4.4, image: 'images/power-bank.jpg', description: 'Charge your devices on the go with a high-capacity power bank.', purchases: 1450, warranty: '1-Year' },
+                { id: 18, name: 'Stylish Backpack', price: 65.00 * 82.5, category: 'Accessories', rating: 4.7, image: 'images/backpack.jpg', description: 'Spacious and durable backpack for school, work, or travel. Material: Polyester.', purchases: 790, warranty: '2-Year' },
+                { id: 19, name: 'Scented Candle Set', price: 22.00 * 82.5, category: 'Home Decor', rating: 4.6, image: 'images/candle-set.jpg', description: 'Enjoy a set of three beautifully scented soy-wax candles. Material: Soy Wax.', purchases: 910, warranty: 'None' },
+                { id: 20, name: 'Stainless Steel Cookware Set', price: 180.00 * 82.5, category: 'Kitchen', rating: 4.9, image: 'images/cookware.jpg', description: 'A complete set for all your cooking needs. Material: Stainless Steel.', purchases: 550, warranty: 'Lifetime' },
+                { id: 21, name: 'Electric Kettle', price: 40.00 * 82.5, category: 'Kitchen', rating: 4.5, image: 'images/kettle.jpg', description: 'Boil water quickly and safely with auto shut-off functionality.', purchases: 680, warranty: '1-Year' },
+                { id: 22, name: 'Digital Camera', price: 450.00 * 82.5, category: 'Electronics', rating: 4.7, image: 'images/camera.jpg', description: 'Capture stunning photos and videos with high resolution. Last month purchases: 230.', warranty: '2-Year' },
+                { id: 23, name: 'Running Shoes', price: 70.00 * 82.5, category: 'Clothing', rating: 4.6, image: 'images/shoes.jpg', description: 'Lightweight and cushioned for maximum comfort on your runs. Material: Polyester.', purchases: 1100, warranty: '90-Day' },
+                { id: 24, name: 'Smart Thermostat', price: 150.00 * 82.5, category: 'Home Decor', rating: 4.8, image: 'images/thermostat.jpg', description: 'Control your home\'s temperature from your smartphone. Last month purchases: 180.', warranty: '5-Year' },
+                { id: 25, name: 'Durable Suitcase', price: 110.00 * 82.5, category: 'Accessories', rating: 4.5, image: 'images/suitcase.jpg', description: 'A hard-shell suitcase with smooth-rolling wheels for easy travel. Material: Polycarbonate.', purchases: 560, warranty: '10-Year' },
+                { id: 26, name: 'Espresso Machine', price: 300.00 * 82.5, category: 'Kitchen', rating: 4.9, image: 'images/espresso-machine.jpg', description: 'Brew barista-quality coffee at home with this compact machine. Last month purchases: 310.', warranty: '2-Year' },
+                { id: 27, name: 'Casual Hoodie', price: 50.00 * 82.5, category: 'Clothing', rating: 4.3, image: 'images/hoodie.jpg', description: 'Soft cotton-blend hoodie with a front pocket for comfort. Material: Cotton-blend.', purchases: 940, warranty: '30-Day return' },
+                { id: 28, name: 'Sofa Set', price: 800.00 * 82.5, category: 'Furniture', rating: 4.7, image: 'images/sofa.jpg', description: 'A three-seater sofa with plush cushions and a sturdy frame. Material: Wood & Fabric.', purchases: 150, warranty: '10-Year' },
+                { id: 29, name: 'Electric Shaver', price: 60.00 * 82.5, category: 'Electronics', rating: 4.4, image: 'images/shaver.jpg', description: 'Provides a clean, close shave with its flexible head. Last month purchases: 470.', warranty: '1-Year' },
+                { id: 30, name: 'Portable Bluetooth Speaker', price: 80.00 * 82.5, category: 'Electronics', rating: 4.8, image: 'images/speaker.jpg', description: 'Crisp sound and deep bass in a compact, waterproof design. Last month purchases: 780.', warranty: '1-Year' },
+                { id: 31, name: 'Handcrafted Vase', price: 45.00 * 82.5, category: 'Home Decor', rating: 4.6, image: 'images/vase.jpg', description: 'An elegant ceramic vase to add a touch of art to your home. Material: Ceramic.', purchases: 320, warranty: 'None' },
+                { id: 32, name: 'Leather Belt', price: 30.00 * 82.5, category: 'Accessories', rating: 4.2, image: 'images/belt.jpg', description: 'Genuine leather belt with a durable metal buckle. Material: Leather.', purchases: 590, warranty: '1-Year' },
+                { id: 33, name: 'Toaster Oven', price: 70.00 * 82.5, category: 'Kitchen', rating: 4.5, image: 'images/toaster-oven.jpg', description: 'Bake, broil, and toast with this versatile kitchen appliance.', purchases: 410, warranty: '2-Year' },
+                { id: 34, name: 'Winter Coat', price: 120.00 * 82.5, category: 'Clothing', rating: 4.7, image: 'images/coat.jpg', description: 'Stay warm and stylish in this heavy-duty, waterproof coat. Material: Polyester.', purchases: 670, warranty: '1-Year' },
+                { id: 35, name: 'Outdoor Garden Set', price: 350.00 * 82.5, category: 'Furniture', rating: 4.9, image: 'images/garden-set.jpg', description: 'Weather-resistant furniture for your patio or garden. Material: Wicker & Aluminum.', purchases: 190, warranty: '5-Year' },
+                { id: 36, name: 'Robot Vacuum', price: 280.00 * 82.5, category: 'Electronics', rating: 4.6, image: 'images/robot-vacuum.jpg', description: 'Automatically cleans your floors with smart navigation technology. Last month purchases: 260.', warranty: '2-Year' },
+                { id: 37, name: 'Sun Hat', price: 18.00 * 82.5, category: 'Clothing', rating: 4.1, image: 'images/sun-hat.jpg', description: 'A wide-brimmed hat to protect you from the sun. Material: Straw.', purchases: 340, warranty: 'None' },
+                { id: 38, name: 'Blender', price: 85.00 * 82.5, category: 'Kitchen', rating: 4.7, image: 'images/blender.jpg', description: 'Crush ice and blend smoothies with a powerful motor. Last month purchases: 520.', warranty: '3-Year' },
+                { id: 39, name: 'Digital Scale', price: 25.00 * 82.5, category: 'Home Decor', rating: 4.4, image: 'images/scale.jpg', description: 'Provides precise weight measurements for cooking and baking. Last month purchases: 400.', warranty: '1-Year' },
+                { id: 40, name: 'Wall Art Print', price: 35.00 * 82.5, category: 'Home Decor', rating: 4.8, image: 'images/wall-art.jpg', description: 'Adds a splash of color and style to any room. Last month purchases: 370.', warranty: 'None' }
+            ];
+
+            const productList = document.getElementById('product-list');
+            const searchInput = document.getElementById('search-input');
+            const searchSuggestions = document.getElementById('search-suggestions');
+            const sortMenuButton = document.getElementById('sort-menu-button');
+            const sortMenu = document.getElementById('sort-menu');
+            const filterMenuButton = document.getElementById('filter-menu-button');
+            const filterMenu = document.getElementById('filter-menu');
+            const categoryFilterList = document.getElementById('category-filter-list');
+            
+            let currentProducts = [...products];
+
+            const renderProducts = (filteredProducts) => {
+                productList.innerHTML = '';
+                filteredProducts.forEach(product => {
+                    const productCard = document.createElement('div');
+                    productCard.classList.add('product-card', 'glass-card', 'rounded-2xl', 'p-4', 'flex', 'flex-col', 'items-center', 'text-center');
+                    productCard.innerHTML = `
+                        <div class="product-card-details">
+                            <img src="${product.image}" alt="${product.name}" class="w-full h-40 object-cover rounded-xl mb-4">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">${product.name}</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">${product.category}</p>
+                            <p class="text-lg font-semibold text-primary mt-2">₹${product.price.toFixed(2)}</p>
+                            <div class="flex items-center mt-2">
+                                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                                <span class="text-sm text-gray-500">${product.rating}</span>
+                            </div>
+                        </div>
+                        <div class="product-card-hover-details rounded-2xl p-6 flex flex-col justify-center items-center text-center bg-white dark:bg-dark-bg">
+                            <p class="text-md text-gray-700 dark:text-gray-300 font-semibold mb-2">${product.description}</p>
+                            <div class="text-sm text-gray-500 dark:text-gray-400 space-y-1">
+                                <p><i class="fas fa-shopping-bag mr-1"></i> Purchases: ${product.purchases || 'N/A'}</p>
+                                <p><i class="fas fa-medal mr-1"></i> Warranty: ${product.warranty || 'None'}</p>
+                            </div>
+                        </div>
+                    `;
+                    productList.appendChild(productCard);
+                });
+            };
+
+            const filterAndSortProducts = () => {
+                let filtered = [...products];
+                const searchTerm = searchInput.value.toLowerCase();
+                const activeCategories = Array.from(document.querySelectorAll('input[name="category"]:checked')).map(cb => cb.value);
+                const sortOption = document.querySelector('#sort-menu button[data-sort].active')?.dataset.sort;
+                
+                // Search
+                if (searchTerm) {
+                    filtered = filtered.filter(p => p.name.toLowerCase().includes(searchTerm) || p.category.toLowerCase().includes(searchTerm));
+                }
+
+                // Filter by category
+                if (activeCategories.length > 0) {
+                    filtered = filtered.filter(p => activeCategories.includes(p.category));
+                }
+
+                // Sort
+                if (sortOption === 'price-low-to-high') {
+                    filtered.sort((a, b) => a.price - b.price);
+                } else if (sortOption === 'price-high-to-low') {
+                    filtered.sort((a, b) => b.price - a.price);
+                } else if (sortOption === 'rating-high-to-low') {
+                    filtered.sort((a, b) => b.rating - a.rating);
+                }
+
+                currentProducts = filtered;
+                renderProducts(currentProducts);
+            };
+
+            // Event Listeners for Dropdowns
+            sortMenuButton.addEventListener('click', () => {
+                sortMenu.classList.toggle('hidden');
+                filterMenu.classList.add('hidden'); // Close other menu
+            });
+            filterMenuButton.addEventListener('click', () => {
+                filterMenu.classList.toggle('hidden');
+                sortMenu.classList.add('hidden'); // Close other menu
+            });
+
+            // Event Listeners for Filter and Sort
+            document.getElementById('search-button').addEventListener('click', filterAndSortProducts);
+
+            document.querySelectorAll('#sort-menu button[data-sort]').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    document.querySelectorAll('#sort-menu button[data-sort]').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    filterAndSortProducts();
+                    sortMenu.classList.add('hidden');
+                });
+            });
+
+            // Populate categories dynamically
+            const categories = [...new Set(products.map(p => p.category))];
+            categories.forEach(category => {
+                const categoryItem = document.createElement('div');
+                categoryItem.classList.add('flex', 'items-center', 'px-4', 'py-2', 'space-x-2');
+                categoryItem.innerHTML = `
+                    <input type="checkbox" id="cat-${category}" name="category" value="${category}" class="h-4 w-4 text-primary rounded border-gray-300 focus:ring-primary/50">
+                    <label for="cat-${category}" class="text-sm text-gray-700 dark:text-gray-300">${category}</label>
+                `;
+                categoryItem.querySelector('input').addEventListener('change', filterAndSortProducts);
+                categoryFilterList.appendChild(categoryItem);
+            });
+            
+            // --- START: NEW SEARCH SUGGESTION LOGIC ---
+
+            const showSuggestions = () => {
+                const searchTerm = searchInput.value.toLowerCase();
+                searchSuggestions.innerHTML = ''; // Clear previous suggestions
+
+                if (searchTerm.length === 0) {
+                    searchSuggestions.classList.add('hidden');
+                    return;
+                }
+
+                // Find matching products but limit the number of suggestions (e.g., to 5)
+                const matchingProducts = products
+                    .filter(p => p.name.toLowerCase().includes(searchTerm))
+                    .slice(0, 5);
+
+                if (matchingProducts.length > 0) {
+                    matchingProducts.forEach(product => {
+                        const suggestionItem = document.createElement('div');
+                        suggestionItem.classList.add('p-2', 'rounded-lg', 'cursor-pointer', 'hover:bg-primary/20', 'dark:hover:bg-primary/20', 'text-sm');
+                        suggestionItem.textContent = product.name;
+
+                        // Event listener for clicking a suggestion
+                        suggestionItem.addEventListener('click', () => {
+                            searchInput.value = product.name; // Set input value to the clicked product
+                            searchSuggestions.classList.add('hidden'); // Hide suggestions
+                            filterAndSortProducts(); // Immediately filter the product list
+                        });
+                        searchSuggestions.appendChild(suggestionItem);
+                    });
+                    searchSuggestions.classList.remove('hidden'); // Show the suggestions container
+                } else {
+                    searchSuggestions.classList.add('hidden'); // Hide if no matches
+                }
+            };
+
+            // Show suggestions on input
+            searchInput.addEventListener('input', () => {
+              showSuggestions();
+              filterAndSortProducts();
+            });
+            
+            // Show suggestions again when focusing on the input
+            searchInput.addEventListener('focus', showSuggestions);
+
+            // Hide suggestions when clicking outside the search bar
+            document.addEventListener('click', (e) => {
+                if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
+                    searchSuggestions.classList.add('hidden');
+                }
+            });
+            
+            // --- END: NEW SEARCH SUGGESTION LOGIC ---
+
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                    // Close mobile menu after clicking a link
+                    if (!mobileMenu.classList.contains('hidden')) {
+                         mobileMenu.classList.add('hidden');
+                    }
+                });
+            });
+
+            // Initial render
+            filterAndSortProducts(); // Call once at start to render initial products
+        });
+    </script>
+</body>
+</html>

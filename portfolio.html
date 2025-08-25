@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+
+<html class="dark scroll-smooth" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sarvesh Soumil | Interactive Portfolio</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet"/>
+
+<script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Sora', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary': '#2dd4bf', 
+                        'secondary': '#a78bfa',
+                        'accent': '#f472b6',
+                        'dark-bg': '#0D1117',
+                        'light-bg': '#f5f5f5',
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 1s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            'from': { opacity: '0', transform: 'translateY(20px)' },
+                            'to': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                    },
+                },
+            },
+        };
+    </script>
+<style>/* Base Styles & Animations */
+.animated-element { 
+    opacity: 0; 
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out; 
+}
+.is-visible { 
+    opacity: 1; 
+    transform: translateY(0); 
+}
+
+.animate-blob {
+    animation: blob 20s infinite;
+}
+.animation-delay-2000 { animation-delay: -10s; }
+.animation-delay-4000 { animation-delay: -5s; }
+
+@keyframes blob {
+    0% { transform: translate(0px, 0px) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+    100% { transform: translate(0px, 0px) scale(1); }
+}
+
+/* Glassmorphism Card Effect */
+.glass-card {
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid;
+    transition: transform 0.2s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
+    transform-style: preserve-3d;
+}
+.light .glass-card {
+    background: rgba(255, 255, 255, 0.5);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+.dark .glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+.glass-card:hover {
+    border-color: rgba(45, 212, 191, 0.5);
+    box-shadow: 0 0 25px rgba(45, 212, 191, 0.2);
+}
+.dark .glass-card:hover {
+    border-color: rgba(45, 212, 191, 0.6);
+    box-shadow: 0 0 30px rgba(45, 212, 191, 0.25);
+}
+
+/* Glow Button */
+.glow-button::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border-radius: 9999px;
+    background: radial-gradient(circle, rgba(45, 212, 191, 0.4) 0%, transparent 70%);
+    filter: blur(20px);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.glow-button:hover::after { 
+    opacity: 1; 
+}
+
+/* Project Tags */
+.tag-primary { @apply bg-primary/20 text-primary text-sm px-3 py-1 rounded-full; }
+.tag-secondary { @apply bg-secondary/20 text-secondary text-sm px-3 py-1 rounded-full; }
+.tag-accent { @apply bg-accent/20 text-accent text-sm px-3 py-1 rounded-full; }
+
+/* Unified Timeline Styles (for Projects & Experience) */
+.timeline-container .timeline-line {
+    position: absolute;
+    left: 1rem; /* left-4 on mobile */
+    top: 0;
+    height: 100%;
+    width: 2px;
+    background-color: rgba(239, 68, 68, 0.5); /* Visible Red Line */
+    transform: translateX(-50%);
+    z-index: 0; 
+}
+.timeline-item {
+    @apply relative mb-12;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.timeline-item.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.timeline-dot {
+    @apply absolute left-4 md:left-1/2 top-2 w-4 h-4 rounded-full ring-8 -translate-x-1/2 z-10;
+}
+.timeline-content {
+    transition: transform 0.3s ease-out; /* Kept for smooth hover animation */
+}
+.timeline-title { @apply text-xl font-bold text-gray-900 dark:text-white; }
+.timeline-description { @apply text-gray-600 dark:text-gray-400; }
+.timeline-date { @apply text-sm font-semibold; }
+.timeline-company { @apply text-md text-gray-600 dark:text-gray-400 mb-3; }
+.timeline-duties { @apply list-disc list-inside text-gray-600 dark:text-gray-400 space-y-1 mt-3; }
+
+
+@media (min-width: 768px) {
+    .timeline-container .timeline-line {
+        left: 50%;
+    }
+    .timeline-content.left {
+        margin-right: calc(50% + 2rem);
+    }
+    .timeline-content.right {
+        margin-left: calc(50% + 2rem);
+    }
+    /* --- NEW: Hover animation for desktop view --- */
+    .timeline-content.right:hover {
+        transform: translateX(10px);
+    }
+    .timeline-content.left:hover {
+        transform: translateX(-10px);
+    }
+}</style></head>
+<body class="bg-light-bg dark:bg-dark-bg text-gray-800 dark:text-gray-300 font-sans selection:bg-primary/40 transition-colors duration-300">
+<div class="fixed top-0 left-0 w-full h-full -z-10 overflow-hidden">
+<div class="absolute top-1/4 left-1/4 w-96 h-96 bg-secondary rounded-full opacity-20 filter blur-3xl animate-blob"></div>
+<div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary rounded-full opacity-20 filter blur-3xl animate-blob animation-delay-2000"></div>
+<div class="absolute bottom-1/2 left-1/3 w-80 h-80 bg-accent rounded-full opacity-10 filter blur-3xl animate-blob animation-delay-4000"></div>
+</div>
+<header class="fixed top-0 left-0 w-full z-50 transition-all duration-300" id="header">
+<nav class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center glass-card mt-4 rounded-full">
+<a class="text-xl font-bold tracking-wider text-gray-900 dark:text-white ml-2" href="portfolio.html">Portfolio</a>
+<div class="hidden md:flex items-center space-x-6">
+<a href="index.html" class="hover:text-primary transition-colors font-bold">Main Menu</a>
+<a class="hover:text-primary transition-colors" href="#projects">Projects</a>
+<a class="hover:text-primary transition-colors" href="#skills">Skills</a>
+<a class="hover:text-primary transition-colors" href="#experience">Experience</a>
+<a class="hover:text-primary transition-colors" href="#contact">Contact</a>
+</div>
+<div class="flex items-center">
+<button class="text-lg w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/10 transition-colors" id="theme-toggle">
+<i class="fas fa-sun hidden dark:inline"></i>
+<i class="fas fa-moon inline dark:hidden"></i>
+</button>
+<button class="md:hidden text-lg w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/10 transition-colors ml-2" id="mobile-menu-button">
+<i class="fas fa-bars"></i>
+</button>
+</div>
+</nav>
+<div class="hidden md:hidden max-w-7xl mx-auto mt-2 px-2" id="mobile-menu">
+<div class="glass-card rounded-2xl p-4 flex flex-col space-y-2">
+<a href="index.html" class="hover:text-primary transition-colors text-center p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 font-bold">Home</a>
+<a class="hover:text-primary transition-colors text-center p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5" href="#projects">Projects</a>
+<a class="hover:text-primary transition-colors text-center p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5" href="#skills">Skills</a>
+<a class="hover:text-primary transition-colors text-center p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5" href="#experience">Experience</a>
+<a class="hover:text-primary transition-colors text-center p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5" href="#contact">Contact</a>
+</div>
+</div>
+</header>
+<main class="pt-24">
+<section class="min-h-[calc(100vh-6rem)] flex items-center" id="home">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 grid md:grid-cols-2 gap-16 items-center">
+<div class="text-center md:text-left">
+<h1 class="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white animated-element">
+                        Innovating with <br/>
+<span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Data &amp; Code</span>
+</h1>
+<p class="mt-6 text-lg text-gray-600 dark:text-gray-400 max-w-xl mx-auto md:mx-0 animated-element" style="animation-delay: 0.2s;">
+                        Hi, I'm Sarvesh Soumil, a pre-final year B.Tech Data Science student at Swami Vivekananda University. I'm passionate about building intelligent applications and solving real-world problems.
+                    </p>
+<div class="mt-10 animated-element" style="animation-delay: 0.4s;">
+<a class="glow-button relative inline-block text-lg font-semibold bg-primary text-white px-8 py-3 rounded-full hover:scale-105 transform transition-transform duration-300" href="#contact">
+                            Let's Connect <i class="fas fa-arrow-right ml-2 text-sm"></i>
+</a>
+</div>
+</div>
+<div class="hidden md:flex justify-center items-center animated-element" style="animation-delay: 0.3s;">
+<div class="relative w-72 h-72">
+<div class="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-full blur-2xl opacity-70"></div>
+<img alt="Profile Picture of Sarvesh Soumil" class="relative w-full h-full object-cover rounded-full border-4 border-white dark:border-dark-bg shadow-xl"  src="images/my pic.jpg"/>
+</div>
+</div>
+</div>
+</section>
+<section class="py-24" id="projects">
+<div class="max-w-4xl mx-auto px-4 sm:px-6">
+<div class="text-center mb-16 animated-element"><h2 class="text-4xl font-bold text-gray-900 dark:text-white">Projects &amp; Research</h2><p class="mt-4 text-lg text-gray-600 dark:text-gray-400">A showcase of my passion for development and innovation.</p></div>
+<div class="relative timeline-container">
+<div class="timeline-line"></div>
+<div class="timeline-item"><div class="timeline-dot bg-primary ring-primary/20"></div><div class="timeline-content right glass-card p-6 rounded-2xl ml-10 md:ml-0"><h3 class="timeline-title">Full-Stack Shopping App</h3><p class="timeline-description">A complete e-commerce experience from product browsing and cart management to secure checkout and payment processing.</p><div class="flex flex-wrap gap-2 mt-3"><span class="tag-primary">React</span><span class="tag-secondary">Node.js</span><span class="tag-accent">MongoDB</span></div></div></div>
+<div class="timeline-item"><div class="timeline-dot bg-secondary ring-secondary/20"></div><div class="timeline-content left glass-card p-6 rounded-2xl ml-10 md:ml-0"><h3 class="timeline-title">Multi-Language Netflix Clone</h3><p class="timeline-description">A feature-rich clone of Netflix with a unique multi-language interface supporting English, Hindi, Bengali, Japanese, and more.</p><div class="flex flex-wrap gap-2 mt-3 justify-end md:justify-start"><span class="tag-primary">React</span><span class="tag-secondary">APIs</span><span class="tag-accent">Tailwind CSS</span></div></div></div>
+<div class="timeline-item"><div class="timeline-dot bg-accent ring-accent/20"></div><div class="timeline-content right glass-card p-6 rounded-2xl ml-10 md:ml-0"><h3 class="timeline-title">Online Ticket Reservation</h3><p class="timeline-description">A robust, back-end system for booking and managing tickets, featuring logic for seat selection and transaction handling.</p><div class="flex flex-wrap gap-2 mt-3"><span class="tag-primary">Java</span><span class="tag-secondary">SQL</span><span class="tag-accent">System Design</span></div></div></div>
+<div class="timeline-item"><div class="timeline-dot bg-primary ring-primary/20"></div><div class="timeline-content left glass-card p-6 rounded-2xl ml-10 md:ml-0"><h3 class="timeline-title">Digital Library Management</h3><p class="timeline-description">A comprehensive Java application to manage library operations like book issuance, returns, and catalog management.</p><div class="flex flex-wrap gap-2 mt-3 justify-end md:justify-start"><span class="tag-primary">Java</span><span class="tag-secondary">RDBMS</span><span class="tag-accent">OOP</span></div></div></div>
+<div class="timeline-item"><div class="timeline-dot bg-secondary ring-secondary/20"></div><div class="timeline-content right glass-card p-6 rounded-2xl ml-10 md:ml-0"><h3 class="timeline-title">Research: Image Colorization</h3><p class="timeline-description">Presented research on colorizing grayscale images using advanced deep learning models and generative networks.</p><div class="flex flex-wrap gap-2 mt-3"><span class="tag-primary">Python</span><span class="tag-secondary">Data Science</span><span class="tag-accent">Deep Learning</span></div></div></div>
+<div class="timeline-item"><div class="timeline-dot bg-accent ring-accent/20"></div><div class="timeline-content left glass-card p-6 rounded-2xl ml-10 md:ml-0"><h3 class="timeline-title">Research: Blockchain in Healthcare</h3><p class="timeline-description">Developed a conceptual framework leveraging Blockchain to enhance the security and integrity of patient data.</p><div class="flex flex-wrap gap-2 mt-3 justify-end md:justify-start"><span class="tag-primary">Blockchain</span><span class="tag-secondary">Java</span><span class="tag-accent">Security</span></div></div></div>
+</div>
+</div>
+</section>
+<section class="py-24 bg-white/30 dark:bg-dark-bg/50" id="skills">
+<div class="max-w-7xl mx-auto px-4 sm:px-6">
+<div class="text-center mb-16 animated-element"><h2 class="text-4xl font-bold text-gray-900 dark:text-white">Technical Toolbox</h2><p class="mt-4 text-lg text-gray-600 dark:text-gray-400">The tools and technologies I use to bring ideas to life.</p></div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+<div class="glass-card rounded-2xl p-6 animated-element"><h3 class="text-xl font-bold text-primary mb-4">Languages</h3><ul class="space-y-2 text-gray-700 dark:text-gray-300"><li><i class="fas fa-check-circle text-primary/50 mr-2"></i>Java</li><li><i class="fas fa-check-circle text-primary/50 mr-2"></i>Python</li><li><i class="fas fa-check-circle text-primary/50 mr-2"></i>SQL</li><li><i class="fas fa-check-circle text-primary/50 mr-2"></i>JavaScript</li><li><i class="fas fa-check-circle text-primary/50 mr-2"></i>HTML5 &amp; CSS3</li></ul></div>
+<div class="glass-card rounded-2xl p-6 animated-element"><h3 class="text-xl font-bold text-secondary mb-4">Data Science</h3><ul class="space-y-2 text-gray-700 dark:text-gray-300"><li><i class="fas fa-check-circle text-secondary/50 mr-2"></i>Pandas &amp; NumPy</li><li><i class="fas fa-check-circle text-secondary/50 mr-2"></i>Scikit-learn</li><li><i class="fas fa-check-circle text-secondary/50 mr-2"></i>TensorFlow &amp; Keras</li><li><i class="fas fa-check-circle text-secondary/50 mr-2"></i>Matplotlib</li></ul></div>
+<div class="glass-card rounded-2xl p-6 animated-element"><h3 class="text-xl font-bold text-accent mb-4">Databases</h3><ul class="space-y-2 text-gray-700 dark:text-gray-300"><li><i class="fas fa-check-circle text-accent/50 mr-2"></i>MySQL</li><li><i class="fas fa-check-circle text-accent/50 mr-2"></i>PostgreSQL</li><li><i class="fas fa-check-circle text-accent/50 mr-2"></i>RDBMS</li><li><i class="fas fa-check-circle text-accent/50 mr-2"></i>MongoDB</li></ul></div>
+<div class="glass-card rounded-2xl p-6 animated-element"><h3 class="text-xl font-bold text-gray-500 dark:text-gray-400 mb-4">Tools &amp; Platforms</h3><ul class="space-y-2 text-gray-700 dark:text-gray-300"><li><i class="fas fa-check-circle text-gray-500/50 mr-2"></i>Git &amp; GitHub</li><li><i class="fas fa-check-circle text-gray-500/50 mr-2"></i>Docker</li><li><i class="fas fa-check-circle text-gray-500/50 mr-2"></i>Jupyter Notebook</li><li><i class="fas fa-check-circle text-gray-500/50 mr-2"></i>VS Code</li></ul></div>
+</div>
+</div>
+</section>
+<section class="py-24" id="languages">
+<div class="max-w-5xl mx-auto px-4 sm:px-6">
+<div class="text-center mb-16 animated-element"><h2 class="text-4xl font-bold text-gray-900 dark:text-white">Languages</h2><p class="mt-4 text-lg text-gray-600 dark:text-gray-400">I am a polyglot, fluent in the following languages.</p></div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+<div class="glass-card rounded-2xl p-6 text-center animated-element"><h3 class="text-2xl font-bold text-primary">English</h3><p class="text-gray-600 dark:text-gray-400 mt-2">Professional Fluency</p></div>
+<div class="glass-card rounded-2xl p-6 text-center animated-element"><h3 class="text-2xl font-bold text-secondary">Hindi</h3><p class="text-gray-600 dark:text-gray-400 mt-2">Professional Fluency</p></div>
+<div class="glass-card rounded-2xl p-6 text-center animated-element"><h3 class="text-2xl font-bold text-accent">Bengali</h3><p class="text-gray-600 dark:text-gray-400 mt-2">Native / Bilingual</p></div>
+</div>
+</div>
+</section>
+<section class="py-24" id="experience">
+<div class="max-w-4xl mx-auto px-4 sm:px-6">
+<div class="text-center mb-16 animated-element"><h2 class="text-4xl font-bold text-gray-900 dark:text-white">My Professional Journey</h2><p class="mt-4 text-lg text-gray-600 dark:text-gray-400">Where I've honed my skills and contributed to projects.</p></div>
+<div class="relative timeline-container" id="experience-timeline">
+<div class="timeline-line"></div>
+<div class="timeline-item"><div class="timeline-dot bg-primary ring-primary/20"></div><div class="timeline-content right glass-card p-6 rounded-2xl ml-10 md:ml-0"><p class="timeline-date text-primary">Current / Upcoming</p><h3 class="timeline-title">Java Developer Intern</h3><p class="timeline-company">Oasis Infobyte</p><ul class="timeline-duties"><li>Working on core Java development projects.</li><li>Contributing to the design and implementation of new features.</li></ul></div></div>
+<div class="timeline-item"><div class="timeline-dot bg-secondary ring-secondary/20"></div><div class="timeline-content left glass-card p-6 rounded-2xl ml-10 md:ml-0"><p class="timeline-date text-secondary">Jul 2025 - Aug 2025</p><h3 class="timeline-title">Frontend Developer Intern</h3><p class="timeline-company">Apex Planet Software Pvt Ltd</p><ul class="timeline-duties"><li>Developed responsive and user-friendly web interfaces.</li><li>Collaborated with designers to translate UI/UX designs into code.</li></ul></div></div>
+<div class="timeline-item"><div class="timeline-dot bg-accent ring-accent/20"></div><div class="timeline-content right glass-card p-6 rounded-2xl ml-10 md:ml-0"><p class="timeline-date text-accent">Aug 2025 - Sep 2025</p><h3 class="timeline-title">Web Developer Intern</h3><p class="timeline-company">Pinnacle Labs, Kolkata</p><ul class="timeline-duties"><li>Developed and maintained web applications.</li><li>Gained experience in front-end and back-end technologies.</li></ul></div></div>
+<div class="timeline-item"><div class="timeline-dot bg-primary ring-primary/20"></div><div class="timeline-content left glass-card p-6 rounded-2xl ml-10 md:ml-0"><p class="timeline-date text-primary">Sep 2024 - Jan 2025</p><h3 class="timeline-title">Campus Ambassador (2nd Term)</h3><p class="timeline-company">Swami Vivekananda University</p><ul class="timeline-duties"><li>Selected for a second term based on performance.</li><li>Mentored junior ambassadors and led university promotional campaigns.</li></ul></div></div>
+<div class="timeline-item"><div class="timeline-dot bg-secondary ring-secondary/20"></div><div class="timeline-content right glass-card p-6 rounded-2xl ml-10 md:ml-0"><p class="timeline-date text-secondary">Sep 2023 - Feb 2024</p><h3 class="timeline-title">Campus Ambassador (1st Term)</h3><p class="timeline-company">Swami Vivekananda University</p><ul class="timeline-duties"><li>Represented the university at events, including at IIT Kharagpur.</li><li>Demonstrated leadership and team management skills.</li></ul></div></div>
+<div class="timeline-item"><div class="timeline-dot bg-accent ring-accent/20"></div><div class="timeline-content left glass-card p-6 rounded-2xl ml-10 md:ml-0"><p class="timeline-date text-accent">Sep 2023 &amp; Sep 2024</p><h3 class="timeline-title">Smart India Hackathon</h3><p class="timeline-company">National Level Participant</p><ul class="timeline-duties"><li>Competed in the prestigious national hackathon for two consecutive years.</li><li>Developed innovative solutions to real-world problem statements.</li></ul></div></div>
+</div>
+</div>
+</section>
+<section class="py-24" id="contact">
+<div class="max-w-3xl mx-auto text-center px-4 sm:px-6 animated-element">
+<h2 class="text-4xl font-bold text-gray-900 dark:text-white">Get In Touch</h2>
+<p class="mt-4 text-lg text-gray-600 dark:text-gray-400 mb-8">I'm currently available for new opportunities. Let's create something great together.</p>
+<div class="inline-flex items-center space-x-4 group">
+<a class="text-xl font-semibold text-primary group-hover:underline" href="mailto:sarveshsoumil@email.com">
+                        sarveshsoumil@email.com
+                    </a>
+<button class="text-gray-400 hover:text-primary transition" id="copy-email" title="Copy email">
+<i class="fas fa-copy" id="copy-icon"></i>
+</button>
+</div>
+</div>
+</section>
+</main>
+<footer class="py-12">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 text-center text-gray-600 dark:text-gray-500">
+<div class="flex justify-center space-x-6 mb-4">
+<a class="text-2xl hover:text-primary transition" href="#" target="_blank"><i class="fab fa-github"></i></a>
+<a class="text-2xl hover:text-primary transition" href="#" target="_blank"><i class="fab fa-linkedin"></i></a>
+<a class="text-2xl hover:text-primary transition" href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+</div>
+<p>Copyright © <span id="current-year"></span> Sarvesh Soumil. Crafted in Kolkata, India.</p>
+<p class="text-sm mt-2">Current Date: <span id="current-date"></span></p>
+</div>
+</footer>
+<button class="fixed bottom-5 right-5 w-12 h-12 bg-primary/80 text-white rounded-full hidden justify-center items-center text-xl backdrop-blur-sm hover:bg-primary transition-all duration-300 scale-0" id="back-to-top">
+<i class="fas fa-arrow-up"></i>
+</button>
+
+<script>document.addEventListener('DOMContentLoaded', () => {
+
+    // --- THEME SWITCH LOGIC ---
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+    themeToggleBtn.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('color-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    // --- MOBILE MENU TOGGLE ---
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+    
+    // --- HIDE MOBILE MENU ON LINK CLICK ---
+    document.querySelectorAll('#mobile-menu a').forEach(link => {
+        link.addEventListener('click', () => {
+            mobileMenu.classList.add('hidden');
+        });
+    });
+
+    // --- DATE & YEAR ---
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+    document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    // --- 3D TILT CARD EFFECT ---
+    document.querySelectorAll('.tilt-card').forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const { width, height } = rect;
+            const rotateX = (y / height - 0.5) * -15;
+            const rotateY = (x / width - 0.5) * 15;
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+        });
+    });
+
+    // --- INTERSECTION OBSERVER FOR ANIMATIONS ---
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                // Apply a staggered delay for timeline items
+                if (entry.target.classList.contains('timeline-item')) {
+                     entry.target.style.transitionDelay = `${index * 150}ms`;
+                }
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.animated-element, .timeline-item').forEach(el => {
+        if (el.classList.contains('animated-element')) {
+            el.style.transform = 'translateY(30px)';
+        }
+        observer.observe(el);
+    });
+
+    // --- COPY EMAIL LOGIC ---
+    const copyBtn = document.getElementById('copy-email');
+    const copyIcon = document.getElementById('copy-icon');
+    const emailToCopy = 'sarveshsoumil@email.com';
+    copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(emailToCopy).then(() => {
+            copyIcon.classList.replace('fa-copy', 'fa-check');
+            copyBtn.title = 'Copied!';
+            setTimeout(() => {
+                copyIcon.classList.replace('fa-check', 'fa-copy');
+                copyBtn.title = 'Copy email';
+            }, 2000);
+        });
+    });
+    
+    // --- BACK TO TOP BUTTON & HEADER STYLE ON SCROLL ---
+    const backToTopButton = document.getElementById('back-to-top');
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            backToTopButton.classList.remove('hidden');
+            backToTopButton.classList.add('flex');
+            setTimeout(() => backToTopButton.style.transform = 'scale(1)', 10);
+            header.classList.add('scrolled');
+        } else {
+            backToTopButton.style.transform = 'scale(0)';
+            setTimeout(() => backToTopButton.classList.add('hidden'), 300);
+            header.classList.remove('scrolled');
+        }
+    });
+    backToTopButton.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // --- SMOOTH SCROLL FOR ANCHOR LINKS ---
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+});
+</script></body>
+</html>
